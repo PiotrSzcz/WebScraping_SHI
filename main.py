@@ -67,6 +67,6 @@ if __name__ == "__main__":
 
     for title, ep in lib_ep.items():
         print(f'{title[0:40]:<41}{ep}')
-
+    print(f'"Skuteczność programu: "{(len(lib_ep)/int(quantity_of_series))*100}"%"')
     web_controller.quit()
     sleep = input()
