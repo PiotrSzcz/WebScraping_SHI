@@ -33,34 +33,41 @@ if __name__ == "__main__":
     lib_ep = {}
     title_list = []
     for i in range(0, quantity_of_series):
-        if(i==2)or(i==4):
+        try:
+            if(i==2)or(i==4):
+                title_list.append("error")
+                continue
+            season_group = web_controller.find_element(By.CSS_SELECTOR, "#group-tv > ul")
+            title_list.append(season_group.find_elements(By.CLASS_NAME, "box-title"))
+
+            current_title = title_list[i][i].text
+            ActionChains(web_controller).click(title_list[i][i]).perform()
+            time.sleep(1)
+            action_list = web_controller.find_element(By.CSS_SELECTOR,"body > div.l-global-width.l-container-primary > div > nav > ul > li:nth-child(2) > a")
+            ActionChains(web_controller).click(action_list).perform()
+            time.sleep(1)
+            episode_list = web_controller.find_element(By.CSS_SELECTOR,"body > div.l-global-width.l-container-primary > div > article > section:nth-child(2) > div.table-responsive > table > tbody")
+            time.sleep(1)
+
+            translated_ep = []
+            for row in episode_list.find_elements(By.TAG_NAME, "tr"):
+                one_line = []
+                for kol in row.find_elements(By.TAG_NAME, "td"):
+                    one_line.append(kol.text)
+                if(one_line[3] == "     ")or(one_line[3] == "   ")or(one_line[3] == " "):
+                    translated_ep.append(one_line[0])
+
+            lib_ep[current_title] = translated_ep
+            web_controller.get('https://shinden.pl/series/season/current')
+            time.sleep(2)
+        except(exceptions.NoSuchElementException):
             title_list.append("error")
+            web_controller.get('https://shinden.pl/series/season/current')
+            time.sleep(2)
             continue
-        season_group = web_controller.find_element(By.CSS_SELECTOR, "#group-tv > ul")
-        title_list.append(season_group.find_elements(By.CLASS_NAME, "box-title"))
 
-        current_title = title_list[i][i].text
-        ActionChains(web_controller).click(title_list[i][i]).perform()
-        time.sleep(1)
-        action_list = web_controller.find_element(By.CSS_SELECTOR,"body > div.l-global-width.l-container-primary > div > nav > ul > li:nth-child(2) > a")
-        ActionChains(web_controller).click(action_list).perform()
-        time.sleep(1)
-        episode_list = web_controller.find_element(By.CSS_SELECTOR,"body > div.l-global-width.l-container-primary > div > article > section:nth-child(2) > div.table-responsive > table > tbody")
-        time.sleep(1)
-
-        translated_ep = []
-        for row in episode_list.find_elements(By.TAG_NAME, "tr"):
-            one_line = []
-            for kol in row.find_elements(By.TAG_NAME, "td"):
-                one_line.append(kol.text)
-            if(one_line[3] == "     ")or(one_line[3] == "   ")or(one_line[3] == " "):
-                translated_ep.append(one_line[0])
-
-        lib_ep[current_title] = translated_ep
-        web_controller.get('https://shinden.pl/series/season/current')
-        time.sleep(2)
     for title, ep in lib_ep.items():
         print(f'{title[0:40]:<41}{ep}')
-    
+
     web_controller.quit()
     sleep = input()
