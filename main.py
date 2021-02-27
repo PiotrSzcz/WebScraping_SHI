@@ -34,9 +34,6 @@ if __name__ == "__main__":
     title_list = []
     for i in range(0, quantity_of_series):
         try:
-            if(i==2)or(i==4):
-                title_list.append("error")
-                continue
             season_group = web_controller.find_element(By.CSS_SELECTOR, "#group-tv > ul")
             title_list.append(season_group.find_elements(By.CLASS_NAME, "box-title"))
 
@@ -60,8 +57,10 @@ if __name__ == "__main__":
             lib_ep[current_title] = translated_ep
             web_controller.get('https://shinden.pl/series/season/current')
             time.sleep(2)
-        except(exceptions.NoSuchElementException):
-            title_list.append("error")
+        except:
+            if(len(title_list)==i):
+                title_list.append("error")
+            print('wywaliło exeption')
             web_controller.get('https://shinden.pl/series/season/current')
             time.sleep(2)
             continue
